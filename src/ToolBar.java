@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-public class ToolBar extends JPanel implements ActionListener{
+public class ToolBar extends JPanel implements ActionListener {
     
     MainWindow parant;
     JToolBar[] toolBar;
@@ -17,6 +17,9 @@ public class ToolBar extends JPanel implements ActionListener{
     
     /*填滿按鈕*/
     JToggleButton fill_JTBtn;
+    
+    /*選取按鈕*/
+    JToggleButton select_JTBtn;
     
     /*形狀按鈕*/
     JToggleButton[] shape_JTBtn;
@@ -78,6 +81,13 @@ public class ToolBar extends JPanel implements ActionListener{
         fill_JTBtn.addActionListener(this);
         fill_JTBtn.setFocusable(false);
         toolBar[1].add(fill_JTBtn);
+        
+        /*新增選取按鈕*/
+        select_JTBtn = new JToggleButton("選");
+        select_JTBtn.addActionListener(this);
+        select_JTBtn.setFocusable(false);
+        buttonGroup.add(select_JTBtn);
+        toolBar[1].add(select_JTBtn);
         
         /*新增形狀按鈕*/
         shape_JTBtn = new JToggleButton[shapeBtnName.length];
@@ -171,6 +181,10 @@ public class ToolBar extends JPanel implements ActionListener{
             AbstractButton abstractButton = (AbstractButton) e.getSource();
             boolean selected = abstractButton.getModel().isSelected();
             parant.page.isFill = selected;
+        }
+        
+        if (e.getSource() == select_JTBtn) {
+            parant.page.status = Status.Select;
         }
         
         for (int i = 0; i < shapeBtnName.length; i++) {

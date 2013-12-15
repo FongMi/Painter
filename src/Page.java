@@ -1,7 +1,6 @@
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,16 +14,16 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Page extends JPanel {
-    private Point p1, p2;
+    private Point p1, p2, Drag;
+    private int Start, lineWidth;
     private Color PenColor, EraserColor;
     private Stroke PenStroke;
-    private Shape shape = null;
+    private Shape shape = null, shapeBeingDragged = null;
     public String string;
-    private int Start, lineWidth;
-    private final ArrayList<DrawObjects> shapeList = new ArrayList();
     private final ArrayList<DrawObjects> freeList = new ArrayList();
-    private boolean CtrlDown = false; 
-    public boolean isFill = false; 
+    private final ArrayList<Shape> shapeList = new ArrayList();
+    private boolean CtrlDown = false;
+    public boolean isFill = false;
     public Status status;
     
     Page(MainWindow parant) {
@@ -43,23 +42,18 @@ public class Page extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-
-        for (DrawObjects temp : shapeList) {
+        for (Shape temp : shapeList) {
             g2d.setStroke(temp.stroke);
             g2d.setColor(temp.color);
-            if(temp.isFill)
-                g2d.fill(temp.s);
-            g2d.draw(temp.s);
+            temp.draw(g);
         }
         if (shape != null && status != Status.Eraser) { //畫出拖曳軌跡
             g2d.setStroke(PenStroke);
             g2d.setColor(PenColor);
-            if(isFill)
-                g2d.fill(shape);
-            g2d.draw(shape);
+            shape.draw(g);
         }
     }
-    
+
     public void Undo() {
         shape = null;
         int f_size = freeList.size() - 1;
@@ -76,51 +70,57 @@ public class Page extends JPanel {
         }
         repaint();
     }
-    
-    public void  ChooseColor() {
+
+    public void ChooseColor() {
         Color c = JColorChooser.showDialog(this, "選擇顏色", getBackground());
         if (c != null) {
-            if(ToolBar.colorJTBtn[0].isSelected()) {
+            if (ToolBar.colorJTBtn[0].isSelected()) {
                 ToolBar.colorPanel[0].setBackground(c);
-            } else if(ToolBar.colorJTBtn[1].isSelected()){
+            } else if (ToolBar.colorJTBtn[1].isSelected()) {
                 ToolBar.colorPanel[1].setBackground(c);
             }
         }
     }
-    
-    public void  SetStroke(int lineWidth) {
+
+    public void SetStroke(int lineWidth) {
         this.lineWidth = lineWidth;
         PenStroke = new BasicStroke(this.lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
         this.requestFocus();
     }
-    
-    public void  SetString(String string) {
+
+    public void SetString(String string) {
         this.string = string;
         /*Graphics2D g2d = (Graphics2D) this.getGraphics();
-        g2d.setFont(new Font(string, Font.PLAIN, 20));
-        g2d.drawString("哈哈哈", 100, 100);*/
+         g2d.setFont(new Font(string, Font.PLAIN, 20));
+         g2d.drawString("哈哈哈", 100, 100);*/
         this.requestFocus();
     }
-    
+
     class myKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
-            if(e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown())
+            if (e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown()) {
                 Undo();
-            if(e.getKeyCode() == KeyEvent.VK_ADD && e.isControlDown()&& lineWidth < 30)
-                SetStroke(lineWidth+1);
-            if(e.getKeyCode() == KeyEvent.VK_SUBTRACT && e.isControlDown() && lineWidth > 0)
-                SetStroke(lineWidth-1);
-            if(e.isControlDown())
+            }
+            if (e.getKeyCode() == KeyEvent.VK_ADD && e.isControlDown() && lineWidth < 30) {
+                SetStroke(lineWidth + 1);
+            }
+            if (e.getKeyCode() == KeyEvent.VK_SUBTRACT && e.isControlDown() && lineWidth > 0) {
+                SetStroke(lineWidth - 1);
+            }
+            if (e.isControlDown()) {
                 CtrlDown = true;
+            }
         }
+
         @Override
         public void keyReleased(KeyEvent e) {
-            if(!e.isControlDown())
+            if (!e.isControlDown()) {
                 CtrlDown = false;
+            }
         }
     }
-    
+
     class myMouseAdapter extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
@@ -128,50 +128,81 @@ public class Page extends JPanel {
             PenColor = ToolBar.colorPanel[0].getBackground();
             EraserColor = ToolBar.colorPanel[1].getBackground();
             
-            if(status == Status.Pen || status == Status.Eraser) {
-                Start =  shapeList.size();
+            switch (status) {
+                case Pen:
+                case Eraser:
+                    Start = shapeList.size();
+                    break;
+                case Select:
+                    for (Shape s : shapeList) {
+                        if (s.containsPoint(p1.x, p1.y)) {
+                            shapeBeingDragged = s;
+                            Drag = new Point(p1);
+                            if (e.isShiftDown()) {
+                                shapeList.remove(s);
+                                shapeList.add(s);
+                                repaint();
+                            }
+                            return;
+                        }
+                    }
+                    break;
             }
         }
-        
+
         @Override
         public void mouseDragged(MouseEvent e) {
             p2 = e.getPoint();
             int width = Math.abs(p2.x - p1.x);
             int height = Math.abs(p2.y - p1.y);
-            
+
             if (CtrlDown)
                 height = width;
 
             switch (status) {
                 case Pen:
-                    shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
+                    shape = new LineShape();
+                    shape.reshape(p1, p2, PenColor, PenStroke);
                     p1 = p2;
-                    shapeList.add(new DrawObjects(shape, PenColor, PenStroke, false));
+                    shapeList.add(shape);
                     break;
                 case Eraser:
-                    shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
+                    shape = new LineShape();
+                    shape.reshape(p1, p2, EraserColor, PenStroke);
                     p1 = p2;
-                    shapeList.add(new DrawObjects(shape, EraserColor, PenStroke, false));
+                    shapeList.add(shape);
                     break;
                 case Line:
-                    shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
+                    shape = new LineShape();
+                    shape.reshape(p1, p2, PenColor, PenStroke);
                     break;
                 case Rectangle:
-                    shape = new Rectangle2D.Double(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height);
+                    shape = new RectShape();
+                    shape.reshape(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height, PenColor, PenStroke, isFill);
                     break;
                 case Round_Rectangle:
-                    shape = new RoundRectangle2D.Double(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height, 30, 30);
+                    shape = new RoundRectShape();
+                    shape.reshape(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height, PenColor, PenStroke, isFill);
                     break;
                 case Oval:
-                    shape = new Ellipse2D.Double(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height);
+                    shape = new OvalShape();
+                    shape.reshape(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height, PenColor, PenStroke, isFill);
                     break;
+                case Select:
+                    if (shapeBeingDragged != null) {
+                        shapeBeingDragged.moveBy(p2.x - Drag.x, p2.y - Drag.y);
+                        Drag = p2;
+                    }
             }
             repaint();
             MainWindow.statusBar.setText("滑鼠座標: (" + e.getX() + "," + e.getY() + ")");
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
+            int x = e.getX();
+            int y = e.getY();
+
             switch (status) {
                 case Pen:
                 case Eraser:
@@ -181,12 +212,24 @@ public class Page extends JPanel {
                 case Rectangle:
                 case Round_Rectangle:
                 case Oval:
-                    shapeList.add(new DrawObjects(shape, PenColor, PenStroke, isFill));
+                    shapeList.add(shape);
                     repaint();
+                    break;
+                case Select:
+                    if (shapeBeingDragged != null) {
+                        shapeBeingDragged.moveBy(x - Drag.x, y - Drag.y);
+                        if (shapeBeingDragged.left >= getSize().width || shapeBeingDragged.top >= getSize().height
+                                || shapeBeingDragged.left + shapeBeingDragged.width < 0
+                                || shapeBeingDragged.top + shapeBeingDragged.height < 0) {
+                            shapeList.remove(shapeBeingDragged); 
+                        }
+                        shapeBeingDragged = null;
+                        repaint();
+                    }
                     break;
             }
         }
-        
+
         @Override
         public void mouseMoved(MouseEvent e) {
             MainWindow.statusBar.setText("滑鼠座標: (" + e.getX() + "," + e.getY() + ")");
@@ -198,7 +241,7 @@ public class Page extends JPanel {
         shape = null;
         repaint();
     }
-    
+
     public void Open() {
         JFileChooser Open_JC = new JFileChooser();
         Open_JC.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -209,13 +252,13 @@ public class Page extends JPanel {
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = Open_JC.getSelectedFile();
             /*try {
-                image = ImageIO.read(new File(file.getAbsolutePath()));
-                repaint();
-            } catch (IOException e) {
-            }*/
+             image = ImageIO.read(new File(file.getAbsolutePath()));
+             repaint();
+             } catch (IOException e) {
+             }*/
         }
     }
-    
+
     public void Save() {
         JFileChooser Save_JC = new JFileChooser();
         Save_JC.setFileSelectionMode(JFileChooser.SAVE_DIALOG | JFileChooser.DIRECTORIES_ONLY);
