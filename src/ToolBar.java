@@ -15,6 +15,9 @@ public class ToolBar extends JPanel implements ActionListener{
     String penBtnName[][] = {{"Pen", "鉛筆，使用選取的線條寬度繪製任意形狀的線條"},{"Eraser", "橡皮擦，清除圖片的的一部份，並以背景色彩取代"}};
     String penImage[] = {"img/pencil.png", "img/eraser.png"};
     
+    /*填滿按鈕*/
+    JToggleButton fill_JTBtn;
+    
     /*形狀按鈕*/
     JToggleButton[] shape_JTBtn;
     String shapeBtnName[][] = {{"Line", "直線"}, {"Rectangle", "矩形"}, {"Round_Rectangle", "圓角矩形"}, {"Oval", "橢圓形"}};
@@ -25,8 +28,10 @@ public class ToolBar extends JPanel implements ActionListener{
     Integer[] lineWidth_px = {4, 8, 16, 24};
     JComboBox lineWidthList;
     
-    JToggleButton fill_JTBtn;
-            
+    /*字形設定*/
+    String[] strings = {"Ariel", "Myriad", "Time New Roman", "標楷體", "新細明體", "微軟正黑體"};
+    JComboBox stringList;
+
     /*功能按鈕*/
     JButton[] jBtn;
     String btnName[][] = {{"復原","復原(Ctrl+Z) 復原上次的動作"}, {"顏色","編輯色彩，從調色盤選取色彩"}};
@@ -67,6 +72,13 @@ public class ToolBar extends JPanel implements ActionListener{
             toolBar[1].add(pen_JTBtn[i]);
         }
         
+        /*新增填滿按鈕*/
+        fill_JTBtn = new JToggleButton();
+        fill_JTBtn.setIcon(new ImageIcon(this.getClass().getResource("img/fill.png")));
+        fill_JTBtn.addActionListener(this);
+        fill_JTBtn.setFocusable(false);
+        toolBar[1].add(fill_JTBtn);
+        
         /*新增形狀按鈕*/
         shape_JTBtn = new JToggleButton[shapeBtnName.length];
         for (int i = 0; i < shapeBtnName.length; i++) {
@@ -85,10 +97,20 @@ public class ToolBar extends JPanel implements ActionListener{
         lineWidthList.setToolTipText("大小(Ctrl++, Ctrl+-)");
         toolBar[3].add(lineWidthList);
         
-        fill_JTBtn = new JToggleButton("填滿");
-        fill_JTBtn.addActionListener(this);
-        fill_JTBtn.setFocusable(false);
-        toolBar[3].add(fill_JTBtn);
+        /*新增字形設定--暫時不加*/
+        stringList = new JComboBox();
+        for (int i = 0; i < strings.length; i++) {
+            stringList.addItem(strings[i]);
+        }
+        stringList.addActionListener(this);
+        //toolBar[3].add(stringList);
+        /*GraphicsEnvironment ge;
+        ge=GraphicsEnvironment.getLocalGraphicsEnvironment();
+        
+        String fnt[]=ge.getAvailableFontFamilyNames();
+        for(int i=220;i<fnt.length-2;i++)
+            StringList.addItem(fnt[i]);
+        */
         
         /*新增其他功能按鈕*/
         jBtn = new JButton[btnName.length];
@@ -115,6 +137,7 @@ public class ToolBar extends JPanel implements ActionListener{
             colorJTBtn[i].setFocusable(false);
             colorJTBtn[i].add(colorPanel[i]);
             colorJTBtn[0].setSelected(true);
+            colorJTBtn[i].setPreferredSize(new Dimension(32,32));
             color_ButtonGroup.add(colorJTBtn[i]);
             toolBar[3].add(colorJTBtn[i]);
         }
@@ -143,6 +166,13 @@ public class ToolBar extends JPanel implements ActionListener{
                 parant.page.status = Status.valueOf(penBtnName[i][0]);
             }
         }
+        
+        if (e.getSource() == fill_JTBtn) {
+            AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            parant.page.isFill = selected;
+        }
+        
         for (int i = 0; i < shapeBtnName.length; i++) {
             if (e.getSource() == shape_JTBtn[i]) {
                 parant.page.status = Status.valueOf(shapeBtnName[i][0]);
@@ -162,10 +192,8 @@ public class ToolBar extends JPanel implements ActionListener{
             parant.page.SetStroke(lineWidth_px[lineWidthList.getSelectedIndex()]);
         }
         
-        if (e.getSource() == fill_JTBtn) {
-            AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-            parant.page.isFill = selected;
+        if (e.getSource() == stringList) {
+            parant.page.SetString(stringList.getSelectedItem().toString());
         }
         
         if (e.getSource() == jBtn[0]) {

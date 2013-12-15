@@ -19,6 +19,7 @@ public class Page extends JPanel {
     private Color PenColor, EraserColor;
     private Stroke PenStroke;
     private Shape shape = null;
+    public String string;
     private int Start, lineWidth;
     private final ArrayList<DrawObjects> shapeList = new ArrayList();
     private final ArrayList<DrawObjects> freeList = new ArrayList();
@@ -34,6 +35,7 @@ public class Page extends JPanel {
         this.addKeyListener(new myKeyAdapter());
         lineWidth = 4;
         status = Status.Pen;
+        string = "Ariel";
         PenStroke = new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     }
 
@@ -89,6 +91,14 @@ public class Page extends JPanel {
     public void  SetStroke(int lineWidth) {
         this.lineWidth = lineWidth;
         PenStroke = new BasicStroke(this.lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
+        this.requestFocus();
+    }
+    
+    public void  SetString(String string) {
+        this.string = string;
+        /*Graphics2D g2d = (Graphics2D) this.getGraphics();
+        g2d.setFont(new Font(string, Font.PLAIN, 20));
+        g2d.drawString("哈哈哈", 100, 100);*/
         this.requestFocus();
     }
     
