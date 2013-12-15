@@ -25,6 +25,8 @@ public class ToolBar extends JPanel implements ActionListener{
     Integer[] lineWidth_px = {4, 8, 16, 24};
     JComboBox lineWidthList;
     
+    JToggleButton fill_JTBtn;
+            
     /*功能按鈕*/
     JButton[] jBtn;
     String btnName[][] = {{"復原","復原(Ctrl+Z) 復原上次的動作"}, {"顏色","編輯色彩，從調色盤選取色彩"}};
@@ -82,6 +84,11 @@ public class ToolBar extends JPanel implements ActionListener{
         lineWidthList.addActionListener(this);
         lineWidthList.setToolTipText("大小(Ctrl++, Ctrl+-)");
         toolBar[3].add(lineWidthList);
+        
+        fill_JTBtn = new JToggleButton("填滿");
+        fill_JTBtn.addActionListener(this);
+        fill_JTBtn.setFocusable(false);
+        toolBar[3].add(fill_JTBtn);
         
         /*新增其他功能按鈕*/
         jBtn = new JButton[btnName.length];
@@ -153,6 +160,12 @@ public class ToolBar extends JPanel implements ActionListener{
 
         if (e.getSource() == lineWidthList) {
             parant.page.SetStroke(lineWidth_px[lineWidthList.getSelectedIndex()]);
+        }
+        
+        if (e.getSource() == fill_JTBtn) {
+            AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            parant.page.isFill = selected;
         }
         
         if (e.getSource() == jBtn[0]) {

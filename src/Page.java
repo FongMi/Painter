@@ -23,8 +23,8 @@ public class Page extends JPanel {
     private final ArrayList<DrawObjects> shapeList = new ArrayList();
     private final ArrayList<DrawObjects> freeList = new ArrayList();
     private boolean CtrlDown = false; 
+    public boolean isFill = false; 
     public Status status;
-    BufferedImage image;
     
     Page(MainWindow parant) {
         this.setBackground(Color.WHITE);
@@ -41,21 +41,20 @@ public class Page extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+
         for (DrawObjects temp : shapeList) {
-            g2d.setColor(temp.color);
             g2d.setStroke(temp.stroke);
+            g2d.setColor(temp.color);
+            if(temp.isFill)
+                g2d.fill(temp.s);
             g2d.draw(temp.s);
         }
         if (shape != null && status != Status.Eraser) { //畫出拖曳軌跡
             g2d.setStroke(PenStroke);
             g2d.setColor(PenColor);
+            if(isFill)
+                g2d.fill(shape);
             g2d.draw(shape);
-        }
-        
-        /*開檔後重畫...需再修改*/
-        if(image!=null) {
-            g2d.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
-            image = null;
         }
     }
     
@@ -137,12 +136,12 @@ public class Page extends JPanel {
                 case Pen:
                     shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
                     p1 = p2;
-                    shapeList.add(new DrawObjects(shape, PenColor, PenStroke));
+                    shapeList.add(new DrawObjects(shape, PenColor, PenStroke, false));
                     break;
                 case Eraser:
                     shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
                     p1 = p2;
-                    shapeList.add(new DrawObjects(shape, EraserColor, PenStroke));
+                    shapeList.add(new DrawObjects(shape, EraserColor, PenStroke, false));
                     break;
                 case Line:
                     shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
@@ -172,7 +171,7 @@ public class Page extends JPanel {
                 case Rectangle:
                 case Round_Rectangle:
                 case Oval:
-                    shapeList.add(new DrawObjects(shape, PenColor, PenStroke));
+                    shapeList.add(new DrawObjects(shape, PenColor, PenStroke, isFill));
                     repaint();
                     break;
             }
@@ -199,11 +198,11 @@ public class Page extends JPanel {
         int result = Open_JC.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = Open_JC.getSelectedFile();
-            try {
+            /*try {
                 image = ImageIO.read(new File(file.getAbsolutePath()));
                 repaint();
             } catch (IOException e) {
-            }
+            }*/
         }
     }
     

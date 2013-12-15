@@ -8,11 +8,13 @@ public class DrawObjects {
     Color color;
     Stroke stroke;
     int start, end;
+    boolean isFill;
     
-    DrawObjects(Shape s, Color color, Stroke stroke) {
+    DrawObjects(Shape s, Color color, Stroke stroke, boolean isFill) {
         this.s = s;
         this.color = color;
         this.stroke = stroke;
+        this.isFill = isFill;
     }
     
     DrawObjects(int start, int end) {
