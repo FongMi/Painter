@@ -8,6 +8,7 @@ abstract class Shape {
 
     Point p1, p2;
     int left, top, width, height;
+    int start, end;
     Color color;
     Stroke stroke;
     boolean isFill;
@@ -29,6 +30,11 @@ abstract class Shape {
         this.isFill = isFill;
     }
 
+    void point(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
+    
     void moveBy(int dx, int dy) {
         left += dx;
         top += dy;

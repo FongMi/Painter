@@ -20,8 +20,8 @@ public class Page extends JPanel {
     private Stroke PenStroke;
     private Shape shape = null, shapeBeingDragged = null;
     public String string;
-    private final ArrayList<DrawObjects> freeList = new ArrayList();
     private final ArrayList<Shape> shapeList = new ArrayList();
+    private final ArrayList<Shape> freeList = new ArrayList();
     private boolean CtrlDown = false;
     public boolean isFill = false;
     public Status status;
@@ -138,12 +138,6 @@ public class Page extends JPanel {
                         if (s.containsPoint(p1.x, p1.y)) {
                             shapeBeingDragged = s;
                             Drag = new Point(p1);
-                            if (e.isShiftDown()) {
-                                shapeList.remove(s);
-                                shapeList.add(s);
-                                repaint();
-                            }
-                            return;
                         }
                     }
                     break;
@@ -155,22 +149,24 @@ public class Page extends JPanel {
             p2 = e.getPoint();
             int width = Math.abs(p2.x - p1.x);
             int height = Math.abs(p2.y - p1.y);
-
+            
             if (CtrlDown)
                 height = width;
-
+            
             switch (status) {
                 case Pen:
                     shape = new LineShape();
                     shape.reshape(p1, p2, PenColor, PenStroke);
                     p1 = p2;
                     shapeList.add(shape);
+                    shape.point(Start, shapeList.size());
                     break;
                 case Eraser:
                     shape = new LineShape();
                     shape.reshape(p1, p2, EraserColor, PenStroke);
                     p1 = p2;
                     shapeList.add(shape);
+                    shape.point(Start, shapeList.size());
                     break;
                 case Line:
                     shape = new LineShape();
@@ -202,11 +198,11 @@ public class Page extends JPanel {
         public void mouseReleased(MouseEvent e) {
             int x = e.getX();
             int y = e.getY();
-
+            
             switch (status) {
                 case Pen:
                 case Eraser:
-                    freeList.add(new DrawObjects(Start, shapeList.size()));
+                    freeList.add(shape);
                     break;
                 case Line:
                 case Rectangle:
@@ -252,10 +248,10 @@ public class Page extends JPanel {
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = Open_JC.getSelectedFile();
             /*try {
-             image = ImageIO.read(new File(file.getAbsolutePath()));
-             repaint();
-             } catch (IOException e) {
-             }*/
+                image = ImageIO.read(new File(file.getAbsolutePath()));
+                repaint();
+            } catch (IOException e) {
+            }*/
         }
     }
 
