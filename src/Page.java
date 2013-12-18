@@ -75,9 +75,9 @@ public class Page extends JPanel {
         Color c = JColorChooser.showDialog(this, "選擇顏色", getBackground());
         if (c != null) {
             if (ToolBar.colorJTBtn[0].isSelected()) {
-                ToolBar.colorPanel[0].setBackground(c);
+                ToolBar.setcolorPanel[0].setBackground(c);
             } else if (ToolBar.colorJTBtn[1].isSelected()) {
-                ToolBar.colorPanel[1].setBackground(c);
+                ToolBar.setcolorPanel[1].setBackground(c);
             }
         }
     }
@@ -125,8 +125,8 @@ public class Page extends JPanel {
         @Override
         public void mousePressed(MouseEvent e) {
             p1 = e.getPoint();
-            PenColor = ToolBar.colorPanel[0].getBackground();
-            EraserColor = ToolBar.colorPanel[1].getBackground();
+            PenColor = ToolBar.setcolorPanel[0].getBackground();
+            EraserColor = ToolBar.setcolorPanel[1].getBackground();
             
             switch (status) {
                 case Pen:
