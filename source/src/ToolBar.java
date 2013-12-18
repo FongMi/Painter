@@ -13,9 +13,9 @@ public class ToolBar extends JPanel implements ActionListener {
     JToggleButton[] pen_JTBtn;
     String penBtnName[][] = {{"Pen", "鉛筆，使用選取的線條寬度繪製任意形狀的線條"},
                              {"Eraser", "橡皮擦，清除圖片的的一部份，並以背景色彩取代"},
-                             {"Select","待修正"}};
+                             {"Move","移動選取的圖形"}};
     
-    String penImage[] = {"img/pencil.png", "img/eraser.png","img/eraser.png"};
+    String penImage[] = {"img/pencil.png", "img/eraser.png","img/move.png"};
     
     /*填滿按鈕*/
     JToggleButton fill_JTBtn;
@@ -205,7 +205,7 @@ public class ToolBar extends JPanel implements ActionListener {
         }
         
         if (e.getSource() == select_JTBtn) {
-            parant.page.status = Status.Select;
+            parant.page.status = Status.Move;
         }
         
         for (int i = 0; i < shapeBtnName.length; i++) {

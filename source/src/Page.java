@@ -133,7 +133,7 @@ public class Page extends JPanel {
                 case Eraser:
                     Start = shapeList.size();
                     break;
-                case Select:
+                case Move:
                     for (Shape s : shapeList) {
                         if (s.containsPoint(p1.x, p1.y)) {
                             shapeBeingDragged = s;
@@ -184,7 +184,7 @@ public class Page extends JPanel {
                     shape = new OvalShape();
                     shape.reshape(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), width, height, PenColor, PenStroke, isFill);
                     break;
-                case Select:
+                case Move:
                     if (shapeBeingDragged != null) {
                         shapeBeingDragged.moveBy(p2.x - Drag.x, p2.y - Drag.y);
                         Drag = p2;
@@ -211,7 +211,7 @@ public class Page extends JPanel {
                     shapeList.add(shape);
                     repaint();
                     break;
-                case Select:
+                case Move:
                     if (shapeBeingDragged != null) {
                         shapeBeingDragged.moveBy(x - Drag.x, y - Drag.y);
                         if (shapeBeingDragged.left >= getSize().width || shapeBeingDragged.top >= getSize().height
