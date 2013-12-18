@@ -2,7 +2,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 
 public class ToolBar extends JPanel implements ActionListener {
     
@@ -50,12 +49,13 @@ public class ToolBar extends JPanel implements ActionListener {
     static JToggleButton[] colorJTBtn;
     static JPanel setcolorPanel[],selectColorPanel[];
     static JButton[] colorsBtn;
-    String colorToolTip[] = {"色彩1(前景色彩)，按一下此處，然後從調色盤選取色彩，"
-                               + "鉛筆圖形都會使用此色彩","色彩2(背景色彩)，"
-                               + "按一下此處，然後從調色盤選取色彩，橡皮擦會使用此色彩"};
+    String colorToolTip[] = {"色彩1(前景色彩)，按一下此處，然後從調色盤選取色彩，鉛筆圖形都會使用此色彩",
+                             "色彩2(背景色彩)，按一下此處，然後從調色盤選取色彩，橡皮擦會使用此色彩"};
+    
     Color colors[] = {Color.BLACK, Color.WHITE, Color.RED, Color.ORANGE, 
                        Color.YELLOW, Color.GREEN, Color.BLUE, Color.CYAN,
                        Color.MAGENTA, Color.PINK, Color.DARK_GRAY, Color.LIGHT_GRAY};
+    
     ToolBar(MainWindow p) {
         parant = p;
         this.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -63,39 +63,21 @@ public class ToolBar extends JPanel implements ActionListener {
         
         toolBar = new JToolBar[toolBarName.length];
         for (int i = 0; i < toolBarName.length; i++) {
-            toolBar[i] = new JToolBar(/*toolBarName[i], JToolBar.VERTICAL*/);
+            toolBar[i] = new JToolBar();
             toolBar[i].setFloatable(false);
-            //toolBar[i].setLayout(new GridLayout(1, 1));
-            //toolBar[i].setBackground(new Color(255, 250, 240));
         }
-        
-        
-        JToolBar[] storebar;
-        storebar = new JToolBar[3];
-        for(int i= 0;i<3;i++)
-        {
-            storebar[i] = new JToolBar();
-            storebar[i].setFloatable(false);
-            storebar[i].setLayout(new BorderLayout());
-            storebar[i].add(BorderLayout.CENTER,toolBar[i]);
-            storebar[i].add(BorderLayout.SOUTH,new JLabel(toolBarName[i],JLabel.CENTER));
-            ToolBar.this.add(storebar[i]);
-        }
-        
-        
-        
 
         /*新增畫筆按鈕*/
         ButtonGroup buttonGroup = new ButtonGroup();
         pen_JTBtn = new JToggleButton[penBtnName.length];
         for (int i = 0; i < penBtnName.length; i++) {
             pen_JTBtn[i] = new JToggleButton();
-            pen_JTBtn[i].setToolTipText(penBtnName[i][1]);
             pen_JTBtn[i].setIcon(new ImageIcon(this.getClass().getResource(penImage[i])));
-            pen_JTBtn[i].setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
-            pen_JTBtn[i].addActionListener(this);
+            pen_JTBtn[i].setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             pen_JTBtn[i].setFocusable(false);
+            pen_JTBtn[i].setToolTipText(penBtnName[i][1]);
             pen_JTBtn[0].setSelected(true);
+            pen_JTBtn[i].addActionListener(this);
             buttonGroup.add(pen_JTBtn[i]);
             toolBar[0].add(pen_JTBtn[i]);
         }
@@ -103,35 +85,29 @@ public class ToolBar extends JPanel implements ActionListener {
         /*新增填滿按鈕*/
         fill_JTBtn = new JToggleButton();
         fill_JTBtn.setIcon(new ImageIcon(this.getClass().getResource("img/fill.png")));
-        fill_JTBtn.addActionListener(this);
+        fill_JTBtn.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         fill_JTBtn.setFocusable(false);
+        fill_JTBtn.addActionListener(this);
         toolBar[0].add(fill_JTBtn);
-        
-        /*新增選取按鈕*//*
-        select_JTBtn = new JToggleButton("選");
-        select_JTBtn.addActionListener(this);
-        select_JTBtn.setFocusable(false);
-        buttonGroup.add(select_JTBtn);
-        toolBar[0].add(select_JTBtn);*/
         
         /*新增形狀按鈕*/
         shape_JTBtn = new JToggleButton[shapeBtnName.length];
         for (int i = 0; i < shapeBtnName.length; i++) {
             shape_JTBtn[i] = new JToggleButton();
-            shape_JTBtn[i].setToolTipText(shapeBtnName[i][1]);
             shape_JTBtn[i].setIcon(new ImageIcon(this.getClass().getResource(shapeImage[i])));
             shape_JTBtn[i].setBorder(BorderFactory.createEmptyBorder(15,10,15,10));
-            shape_JTBtn[i].addActionListener(this);
             shape_JTBtn[i].setFocusable(false);
+            shape_JTBtn[i].setToolTipText(shapeBtnName[i][1]);
+            shape_JTBtn[i].addActionListener(this);
             buttonGroup.add(shape_JTBtn[i]);
             toolBar[1].add(shape_JTBtn[i]);
         }
         
         /*新增線條粗細設置*/
         lineWidthList = new JComboBox(lineWidth);
-        lineWidthList.addActionListener(this);
         lineWidthList.setToolTipText("大小(Ctrl++, Ctrl+-)");
         lineWidthList.setBorder(BorderFactory.createEmptyBorder(14,9,14,9));
+        lineWidthList.addActionListener(this);
         toolBar[2].add(lineWidthList);
         
         /*新增字形設定--暫時不加*/
@@ -149,47 +125,40 @@ public class ToolBar extends JPanel implements ActionListener {
             StringList.addItem(fnt[i]);
         */
         
-
-
         /*新增調色盤按鈕*/
         ButtonGroup color_ButtonGroup = new ButtonGroup();
         colorJTBtn = new JToggleButton[2];
         setcolorPanel = new JPanel[2];
-        colorsBtn = new JButton[colors.length];
         for (int i = 0; i < 2; i++) {
-            colorJTBtn[i] = new JToggleButton();
             setcolorPanel[i] = new JPanel();
             setcolorPanel[i].setBorder(BorderFactory.createEmptyBorder(6,0,16,0));
             setcolorPanel[i].setBackground(colors[i]);
-            
-            
+            colorJTBtn[i] = new JToggleButton();
             colorJTBtn[i].setLayout(new GridLayout(2,1));
-            colorJTBtn[i].add(setcolorPanel[i]);
-            colorJTBtn[i].add(new JLabel("色彩"+(i+1)));
             colorJTBtn[i].setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-            
             colorJTBtn[i].setToolTipText(colorToolTip[i]);
             colorJTBtn[i].setFocusable(false);
             colorJTBtn[0].setSelected(true);
+            colorJTBtn[i].add(setcolorPanel[i]);
+            colorJTBtn[i].add(new JLabel("色彩"+(i+1)));
             color_ButtonGroup.add(colorJTBtn[i]);
             toolBar[3].add(colorJTBtn[i]);
         }
         
+        colorsBtn = new JButton[colors.length];
         selectColorPanel = new JPanel[colors.length];
         JToolBar colorbar = new JToolBar() ;
         for (int i = 0; i < colors.length; i++) {
-            selectColorPanel[i] = new JPanel();
-            colorsBtn[i] = new JButton();
             colorbar.setFloatable(false);
             colorbar.setLayout(new FlowLayout(FlowLayout.LEFT));
-            
+            selectColorPanel[i] = new JPanel();
             selectColorPanel[i].setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
             selectColorPanel[i].setBackground(colors[i]);
-            
-            colorsBtn[i].add(selectColorPanel[i]);
+            colorsBtn[i] = new JButton();
             colorsBtn[i].setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
             colorsBtn[i].setFocusable(false);
             colorsBtn[i].addActionListener(this);
+            colorsBtn[i].add(selectColorPanel[i]);
             colorbar.add(colorsBtn[i]);
         }
         toolBar[3].add(colorbar);
@@ -200,20 +169,25 @@ public class ToolBar extends JPanel implements ActionListener {
             jBtn[i] = new JButton();
             jBtn[i].setToolTipText(btnName[i][1]);
             jBtn[i].setIcon(new ImageIcon(this.getClass().getResource(btnImage[i])));
-            jBtn[i].addActionListener(this);
             jBtn[i].setFocusable(false);
             jBtn[i].setPreferredSize(new Dimension(32,32));
+            jBtn[i].addActionListener(this);
             toolBar[4].add(jBtn[i]);
         }
-        
-        
+
         /*ToolBar 版面設置*/
-        //add(toolBar[0]);
-        //add(toolBar[1]);
-       // add(toolBar[2]);
-        add(toolBar[3]);
-        add(toolBar[4]);
-        
+        JToolBar[] storebar;
+        storebar = new JToolBar[3];
+        for (int i = 0; i < 3; i++) {
+            storebar[i] = new JToolBar();
+            storebar[i].setFloatable(false);
+            storebar[i].setLayout(new BorderLayout());
+            storebar[i].add(BorderLayout.CENTER, toolBar[i]);
+            storebar[i].add(BorderLayout.SOUTH, new JLabel(toolBarName[i], JLabel.CENTER));
+            this.add(storebar[i]);
+        }
+        this.add(toolBar[3]);
+        this.add(toolBar[4]);
     }
 
     @Override
