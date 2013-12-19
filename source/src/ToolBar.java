@@ -7,7 +7,7 @@ public class ToolBar extends JPanel implements ActionListener {
     
     MainWindow parant;
     JToolBar[] toolBar;
-    String toolBarName[] = {"畫筆", "形狀","粗細", "調色盤","其他" };
+    String toolBarName[] = {"畫筆", "形狀", "粗細", "調色盤", "其他"};
     
     /*畫筆按鈕*/
     JToggleButton[] pen_JTBtn;
@@ -15,7 +15,7 @@ public class ToolBar extends JPanel implements ActionListener {
                              {"Eraser", "橡皮擦，清除圖片的的一部份，並以背景色彩取代"},
                              {"Move","移動選取的圖形"}};
     
-    String penImage[] = {"img/pencil.png", "img/eraser.png","img/move.png"};
+    String penImage[] = {"img/pencil.png", "img/eraser.png", "img/move.png"};
     
     /*填滿按鈕*/
     JToggleButton fill_JTBtn;
@@ -52,9 +52,9 @@ public class ToolBar extends JPanel implements ActionListener {
     String colorToolTip[] = {"色彩1(前景色彩)，按一下此處，然後從調色盤選取色彩，鉛筆圖形都會使用此色彩",
                              "色彩2(背景色彩)，按一下此處，然後從調色盤選取色彩，橡皮擦會使用此色彩"};
     
-    Color colors[] = {Color.BLACK, Color.WHITE, Color.RED, Color.ORANGE, 
-                       Color.YELLOW, Color.GREEN, Color.BLUE, Color.CYAN,
-                       Color.MAGENTA, Color.PINK, Color.DARK_GRAY, Color.LIGHT_GRAY};
+    Color colors[] = {new Color(0,0,0), new Color(127,127,127), new Color(136,0,21), new Color(237,28,36), new Color(255,127,39), new Color(255,242,0), new Color(34,177,76),
+                      new Color(0,162,232), new Color(63,72,204), new Color(163,73,164), new Color(255,255,255), new Color(195,195,195), new Color(185,122,87), new Color(255,174,201),
+                      new Color(255,201,14), new Color(239,228,176), new Color(181,230,29), new Color(153,217,234), new Color(112,146,190), new Color(200,191,231)};
     
     ToolBar(MainWindow p) {
         parant = p;
@@ -147,15 +147,15 @@ public class ToolBar extends JPanel implements ActionListener {
         
         colorsBtn = new JButton[colors.length];
         selectColorPanel = new JPanel[colors.length];
-        JToolBar colorbar = new JToolBar() ;
+        JToolBar colorbar = new JToolBar(JToolBar.VERTICAL);
         for (int i = 0; i < colors.length; i++) {
             colorbar.setFloatable(false);
-            colorbar.setLayout(new FlowLayout(FlowLayout.LEFT));
+            colorbar.setLayout(new GridLayout(2,10));
             selectColorPanel[i] = new JPanel();
-            selectColorPanel[i].setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+            selectColorPanel[i].setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
             selectColorPanel[i].setBackground(colors[i]);
             colorsBtn[i] = new JButton();
-            colorsBtn[i].setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+            colorsBtn[i].setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
             colorsBtn[i].setFocusable(false);
             colorsBtn[i].addActionListener(this);
             colorsBtn[i].add(selectColorPanel[i]);
@@ -203,11 +203,7 @@ public class ToolBar extends JPanel implements ActionListener {
             boolean selected = abstractButton.getModel().isSelected();
             parant.page.isFill = selected;
         }
-        
-        if (e.getSource() == select_JTBtn) {
-            parant.page.status = Status.Move;
-        }
-        
+
         for (int i = 0; i < shapeBtnName.length; i++) {
             if (e.getSource() == shape_JTBtn[i]) {
                 parant.page.status = Status.valueOf(shapeBtnName[i][0]);
